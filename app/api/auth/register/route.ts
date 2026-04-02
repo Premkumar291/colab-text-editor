@@ -31,6 +31,11 @@ export async function POST(req: NextRequest) {
     })
 
     const token = signToken({ id: user.id, email: user.email, name: user.name })
+    
+    // Store token in database
+    user.token = token
+    await user.save()
+
     await setAuthCookie(token)
 
     return NextResponse.json({

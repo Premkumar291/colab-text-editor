@@ -14,15 +14,20 @@ export async function POST(req: NextRequest) {
 
     const user = await UserModel.findOne({ email })
     if (!user) {
-      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
+      return NextResponse.json({ error: "User not found" }, { status: 401 })
     }
 
     const isValid = await comparePasswords(password, user.password)
     if (!isValid) {
-      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
+      return NextResponse.json({ error: "Incorrect password" }, { status: 401 })
     }
 
     const token = signToken({ id: user.id, email: user.email, name: user.name })
+    
+    // Store token in database
+    user.token = token
+    await user.save()
+
     await setAuthCookie(token)
 
     return NextResponse.json({

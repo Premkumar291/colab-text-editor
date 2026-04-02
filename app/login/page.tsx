@@ -6,6 +6,7 @@ import { useAuth } from "@/context/auth-context"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { FileText, Loader2 } from "lucide-react"
+import { toast } from "sonner"
 
 export default function LoginPage() {
   const [email, setEmail] = React.useState("")
@@ -19,7 +20,7 @@ export default function LoginPage() {
     try {
       await login({ email, password })
     } catch (err: any) {
-      console.error(err)
+      toast.error(err.message || "Failed to login")
     } finally {
       setPending(false)
     }

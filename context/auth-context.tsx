@@ -27,29 +27,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = React.useState(true)
   const router = useRouter()
 
-  const checkUser = React.useCallback(async () => {
-    try {
-      const res = await fetch("/api/auth/logout", { method: "GET" }) // Wait, I put GET in logout.ts for Me? No, I should check the file.
-      // Re-checking the previous file write... I put both Logout and Me in the same file?
-      // No, I should have put them in separate files or routes.
-    } catch (err) {
-      setUser(null)
-    } finally {
-      setIsLoading(false)
-    }
-  }, [])
-
-  // Re-creating the checkUser logic correctly based on the intended /api/auth/me route
-  const fetchUser = async () => {
-    try {
-      const res = await fetch("/api/auth/logout") // Wait, I mistakenly used the logout file path for the GET Me.
-      // I need to fix the file structure.
-    } catch (err) {
-       setUser(null)
-    } finally {
-       setIsLoading(false)
-    }
-  }
 
   React.useEffect(() => {
     // Initial user fetch

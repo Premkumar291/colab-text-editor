@@ -1,24 +1,24 @@
 # Colab Text Editor
 
-A modern, collaborative rich-text editor built with Next.js and TipTap.
+A modern, professional-grade collaborative rich-text editor built with Next.js, TipTap, and Yjs.
 
-## Features
+## ✨ Features
 
-- **Rich Text Editing**: Powered by TipTap, supporting Bold, Italic, Underline, and structured Heading formats.
-- **Auto-save**: Real-time content persistence with debounced database synchronization.
-- **Clean UI**: Minimalist design inspired by Google Docs for a focused writing experience.
-- **Secure Authentication**: JWT-based user registration and login.
-- **Responsive Design**: Works seamlessly across desktop and mobile devices.
+- **Real-time Collaboration**: Powered by **Yjs (CRDT)** and **Hocuspocus**, enabling multiple users to edit simultaneously with zero conflicts.
+- **Rich Text Experience**: Full support for Bold, Italic, Underline, Headings, Lists, and Blockquotes.
+- **Server-side Persistence**: Document state is saved automatically to MongoDB from the synchronization microservice, ensuring no data loss.
+- **Presence Tracking**: Live participant avatars and real-time cursor indicators for a social writing experience.
+- **Secure Architecture**: JWT-based authentication for WebSocket rooms and API routes.
+- **Premium UI**: Sleek "Canvas" design with adaptive status indicators and a responsive, feature-rich toolbar.
 
-## Tech Stack
+## 🛠️ Tech Stack
 
-- **Framework**: Next.js 15+ (App Router)
-- **Editor**: TipTap (@tiptap/react, @tiptap/starter-kit)
-- **Styling**: Tailwind CSS / Vanilla CSS
-- **Database**: MongoDB (via Mongoose)
-- **Authentication**: JWT / Bcrypt
+- **Frontend**: Next.js 15+ (App Router), TipTap, Tailwind CSS, Lucide Icons.
+- **Synchronization**: Yjs (CRDT), Hocuspocus Server.
+- **Backend/DB**: MongoDB (via Mongoose), JWT Authentication.
+- **Styling**: Modern OKLCH color system with Backdrop-blur surfaces.
 
-## Getting Started
+## 🚀 Getting Started
 
 1.  **Clone the repository**:
     ```bash
@@ -29,29 +29,47 @@ A modern, collaborative rich-text editor built with Next.js and TipTap.
 2.  **Install dependencies**:
     ```bash
     npm install
+    # Also install sync-service dependencies
+    cd colab-sync-service && npm install && cd ..
     ```
 
 3.  **Set up environment variables**:
-    Create a `.env.local` file with:
+    Create a `.env.local` file (root) and `.env` (colab-sync-service) with:
     ```env
     MONGODB_URI=your_mongodb_connection_string
     JWT_SECRET=your_jwt_secret
+    # In production, use wss://your-sync-domain.com
+    NEXT_PUBLIC_COLAB_WS_URL=ws://localhost:1234
+    PORT=1234
     ```
 
-4.  **Run the development server**:
+3.  **Run the application**:
     ```bash
+    # Start the frontend
     npm run dev
+    
+    # In a separate terminal, start the sync service
+    cd colab-sync-service && npm run dev
     ```
 
-5.  **Open the app**:
+4.  **Access the app**:
     Navigate to [http://localhost:3000](http://localhost:3000).
 
-## Optimization Techniques
+## 📄 Documentation
 
-For a detailed breakdown of the performance and UX optimizations implemented in this project, please refer to [optimization.md](./optimization.md).
+- **Architecture & Optimizations**: See [optimization.md](./optimization.md) for details on CRDT implementation and persistence.
+- **API Reference**: Standard REST routes for document metadata and user management.
 
-## Implementation Details
+## 🏛️ Technical Implementation
 
-- **TipTap Integration**: The editor uses a custom `Editor` component wrapping TipTap's `EditorContent`.
-- **Toolbar**: A custom `Toolbar` component provides formatting controls with active state indicators.
-- **Persistence**: Content is saved as HTML in MongoDB to ensure formatting is preserved across sessions.
+- **CRDT Sync**: Uses Yjs binary updates to minimize network payload and handle complex merge scenarios.
+- **Persistence**: Implements `onStoreDocument` hooks on the Hocuspocus server to periodically flush document state to MongoDB. Hocuspocus is the **Single Source of Truth** for content.
+- **Presence**: Awareness protocol synchronization for cursors and participant metadata.
+
+## 🌐 Production Checklist
+
+Before pushing to a live environment, ensure:
+- **Secure WebSockets**: Use `wss://` instead of `ws://` in production.
+- **Port Security**: Ensure the synchronization service port (default `1234`) is open on your firewall but restricted to your application domain if possible.
+- **Process Management**: Use a process manager like **PM2** to keep the synchronization service running.
+- **Database Indexing**: Ensure `docId` and `userId` fields have indexes in MongoDB for optimal performance.

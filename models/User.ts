@@ -9,6 +9,7 @@ export interface IUser {
   status: "online" | "away"
   color: string
   lastSeen: Date
+  token?: string
 }
 
 const UserSchema = new Schema<IUser>(
@@ -21,6 +22,7 @@ const UserSchema = new Schema<IUser>(
     status: { type: String, enum: ["online", "away"], default: "online" },
     color: { type: String, required: true },
     lastSeen: { type: Date, default: Date.now },
+    token: { type: String },
   },
   { timestamps: true }
 )

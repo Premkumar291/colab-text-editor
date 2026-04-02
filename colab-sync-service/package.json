@@ -15,10 +15,13 @@
   "dependencies": {
     "@hocuspocus/server": "^3.4.4",
     "dotenv": "^17.3.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.3.3",
     "tsx": "^4.21.0",
     "yjs": "^13.6.30"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.5.0",
     "typescript": "^6.0.2"
   }

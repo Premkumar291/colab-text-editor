@@ -6,6 +6,7 @@ import { useAuth } from "@/context/auth-context"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { FileText, Loader2, ShieldCheck } from "lucide-react"
+import { toast } from "sonner"
 
 export default function RegisterPage() {
   const [name, setName] = React.useState("")
@@ -20,7 +21,7 @@ export default function RegisterPage() {
     try {
       await signup({ name, email, password })
     } catch (err: any) {
-      console.error(err)
+      toast.error(err.message || "Registration failed")
     } finally {
       setPending(false)
     }
