@@ -99,14 +99,16 @@ export function ShareModal({ docId, docName, trigger }: ShareModalProps) {
       setIsOpen(open)
       if (!open) resetForm()
     }}>
-      <DialogTrigger render={
-        trigger || (
-          <Button size="sm" className="gap-2">
-            <Share2 className="h-4 w-4" />
-            Share
-          </Button>
-        )
-      } />
+      <DialogTrigger 
+        render={
+          trigger || (
+            <Button size="sm" className="gap-2">
+              <Share2 className="h-4 w-4" />
+              Share
+            </Button>
+          )
+        } 
+      />
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Share "{docName}"</DialogTitle>

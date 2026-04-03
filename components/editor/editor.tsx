@@ -11,8 +11,9 @@ import * as Y from "yjs"
 import { useAuth } from "@/context/auth-context"
 import { Toolbar } from "./toolbar"
 import { cn } from "@/lib/utils"
-import { Users, CloudCheck, CloudOff, Loader2, Settings, X } from "lucide-react"
+import { Users, CloudCheck, CloudOff, Loader2, Settings, X, UserPlus } from "lucide-react"
 import { toast } from "sonner"
+import { ShareModal } from "./share-modal"
 
 interface EditorProps {
   docId: string
@@ -20,7 +21,9 @@ interface EditorProps {
   editable?: boolean
   ownerId?: string | null
   initialCollaborators?: any[]
+  initialDocName?: string
   onCollaboratorRemoved?: () => void
+  onAwarenessUpdate?: (users: any[]) => void
 }
 
 const Editor = ({ 
@@ -29,7 +32,9 @@ const Editor = ({
   editable = true,
   ownerId,
   initialCollaborators = [],
-  onCollaboratorRemoved
+  initialDocName = "Untitled Document",
+  onCollaboratorRemoved,
+  onAwarenessUpdate
 }: EditorProps) => {
   const { user } = useAuth()
   const [participants, setParticipants] = React.useState<any[]>([])
@@ -79,25 +84,33 @@ const Editor = ({
   // Technical Excellence: Server-side persistence is now handled by the Hocuspocus backend.
   // We no longer need client-side setInterval polling, reducing network overhead and complexity.
 
-  // Track awareness updates for real-time presence
+  // Awareness Tracking for Cursors and Sidebar
   React.useEffect(() => {
     if (!provider) return
 
     const handleUpdate = () => {
-      if (!provider.awareness) return
-      const states = provider.awareness.getStates()
-      const users = Array.from(states.values()).map((state: any) => state.user).filter(Boolean)
+      const awareness = provider.awareness
+      if (!awareness) return
+
+      const states = awareness.getStates()
+      const users: any[] = []
+      states.forEach((state: any) => {
+        if (state.user) {
+          users.push(state.user)
+        }
+      })
+      
       setParticipants(users)
+      onAwarenessUpdate?.(users)
     }
 
     provider.awareness?.on("update", handleUpdate)
-    // Initial trigger
     handleUpdate()
     
     return () => {
       provider.awareness?.off("update", handleUpdate)
     }
-  }, [provider])
+  }, [provider, onAwarenessUpdate])
 
   const editor = useEditor({
     extensions: [
@@ -240,13 +253,28 @@ const Editor = ({
           </div>
           
           {isOwner && (
-            <button 
-              onClick={() => setIsSettingsOpen(true)}
-              className="p-1.5 hover:bg-muted rounded-md transition-colors text-muted-foreground hover:text-foreground"
-              title="Document Settings"
-            >
-              <Settings className="h-4 w-4" />
-            </button>
+            <div className="flex items-center gap-2">
+              <ShareModal 
+                docId={docId} 
+                docName={initialDocName}
+                trigger={
+                  <button 
+                    className="flex items-center gap-2 px-3 py-1.5 bg-primary text-primary-foreground rounded-lg text-xs font-bold hover:bg-primary/90 transition-all shadow-sm hover:shadow-md"
+                  >
+                    <UserPlus className="h-3.5 w-3.5" />
+                    Add People
+                  </button>
+                }
+              />
+              
+              <button 
+                onClick={() => setIsSettingsOpen(true)}
+                className="p-1.5 hover:bg-muted rounded-md transition-colors text-muted-foreground hover:text-foreground"
+                title="Document Settings"
+              >
+                <Settings className="h-4 w-4" />
+              </button>
+            </div>
           )}
         </div>
       </div>

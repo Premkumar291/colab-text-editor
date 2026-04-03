@@ -23,6 +23,7 @@ export default function EditorClient({ docId, token }: EditorClientProps) {
   const [docName, setDocName] = React.useState("Untitled Document")
   const [owner, setOwner] = React.useState<string | null>(null)
   const [collaborators, setCollaborators] = React.useState<any[]>([])
+  const [activeUsers, setActiveUsers] = React.useState<any[]>([])
 
   /**
    * Technical Excellence:
@@ -77,18 +78,32 @@ export default function EditorClient({ docId, token }: EditorClientProps) {
                   editable={userRole !== "read"}
                   ownerId={owner}
                   initialCollaborators={collaborators}
+                  initialDocName={docName}
                   onCollaboratorRemoved={() => {
                     // Logic to refresh metadata after removal
                     window.location.reload()
                   }}
+                  onAwarenessUpdate={setActiveUsers}
                 />
               </div>
             )}
           </div>
         </main>
         
-        {/* Sidebar can be used for version history or bookmarks in the future */}
-        <Sidebar activeUsers={[]} />
+        {/* Sidebar for real-time collaboration management */}
+        <Sidebar 
+          docId={docId} 
+          docName={docName} 
+          activeUsers={activeUsers} 
+          collaborators={collaborators} 
+          isOwner={userRole === "owner"}
+          onCollaboratorChange={async () => {
+             // Simple version of fetchMetadata
+             const res = await fetch(`/api/documents/${docId}`)
+             const data = await res.json()
+             if (data.document) setCollaborators(data.document.collaborators || [])
+          }}
+        />
       </div>
     </div>
   )

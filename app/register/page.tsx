@@ -80,11 +80,6 @@ export default function RegisterPage() {
               {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Sign Up"}
             </Button>
           </form>
-
-          <div className="flex items-center gap-2 mt-6 text-[10px] text-muted-foreground uppercase justify-center">
-            <ShieldCheck className="h-3 w-3" />
-            <span>Secure 256-bit encryption</span>
-          </div>
         </div>
 
         <p className="text-center text-sm text-muted-foreground">

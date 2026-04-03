@@ -33,10 +33,12 @@ export async function GET(
 
     const role = isOwner ? "owner" : collaborator.role
 
-    // Hydrate collaborator information for the owner's management view
+    // Hydrate collaborator information and pending invites
     let hydratedCollaborators = []
     if (isOwner) {
       const { default: UserModel } = await import("@/models/User")
+      const { default: InvitationModel } = await import("@/models/Invitation")
+      
       const collaboratorIds = document.collaborators.map((c: any) => c.userId)
       const users = await UserModel.find({ id: { $in: collaboratorIds } }).select("id name email color avatar").lean()
       
@@ -47,8 +49,28 @@ export async function GET(
           name: userData?.name || "Unknown User",
           email: userData?.email || "No email",
           color: userData?.color,
-          avatar: userData?.avatar
+          avatar: userData?.avatar,
+          status: "accepted"
         }
+      })
+
+      // Add pending invitations
+      const pendingInvites = await InvitationModel.find({ docId, status: "pending" }).lean()
+      const pendingUserIds = pendingInvites.map(i => i.inviteeId)
+      const pendingUsers = await UserModel.find({ id: { $in: pendingUserIds } }).select("id name email color avatar").lean()
+      
+      pendingInvites.forEach(invite => {
+        const userData = pendingUsers.find(u => u.id === invite.inviteeId)
+        hydratedCollaborators.push({
+          userId: invite.inviteeId,
+          role: invite.role,
+          name: userData?.name || "Pending User",
+          email: userData?.email || invite.inviteeId,
+          color: userData?.color,
+          avatar: userData?.avatar,
+          status: "pending",
+          inviteId: invite._id
+        })
       })
     }
 
@@ -56,7 +78,6 @@ export async function GET(
       document: {
         docId: document.docId,
         name: document.name,
-        // Convert Buffer to base64 for JSON transmission
         content: document.content ? document.content.toString("base64") : null,
         collaborators: hydratedCollaborators,
         owner: document.owner

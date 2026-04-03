@@ -27,6 +27,12 @@ export async function GET(req: NextRequest) {
     .sort({ updatedAt: -1 })
     .lean()
 
+    const { default: InvitationModel } = await import("@/models/Invitation")
+    const pendingInvites = await InvitationModel.find({ 
+      docId: { $in: documents.map(d => d.docId) },
+      status: "pending" 
+    }).lean()
+
     // Map to include the user's role in the response
     const formattedDocs = documents.map(doc => {
       let role = "owner"
@@ -35,12 +41,15 @@ export async function GET(req: NextRequest) {
         role = collaborator ? collaborator.role : "read"
       }
       
+      const docPendingCount = pendingInvites.filter(i => i.docId === doc.docId).length
+      
       return {
         docId: doc.docId,
         name: doc.name,
         role,
         updatedAt: doc.updatedAt,
-        isOwner: doc.owner === decoded.id
+        isOwner: doc.owner === decoded.id,
+        collaboratorsCount: doc.collaborators.length + docPendingCount
       }
     })
 
