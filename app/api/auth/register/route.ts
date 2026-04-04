@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
       color,
     })
 
-    const token = signToken({ id: user.id, email: user.email, name: user.name })
+    const token = await signToken({ id: user.id, email: user.email, name: user.name })
     
     // Store token in database
     user.token = token
