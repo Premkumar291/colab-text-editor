@@ -1,8 +1,7 @@
-import jwt from "jsonwebtoken"
+import { SignJWT, jwtVerify } from "jose"
 import bcrypt from "bcryptjs"
 import { cookies } from "next/headers"
 
-const JWT_SECRET = process.env.JWT_SECRET || "default_fallback_secret_change_me"
 const COOKIE_NAME = "collab_auth_token"
 
 export async function hashPassword(password: string) {
@@ -14,13 +13,20 @@ export async function comparePasswords(password: string, hash: string) {
   return await bcrypt.compare(password, hash)
 }
 
-export function signToken(payload: { id: string; email: string; name: string }) {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: "7d" })
+const getSecret = () => new TextEncoder().encode(process.env.JWT_SECRET || "default_fallback_secret_change_me")
+
+export async function signToken(payload: { id: string; email: string; name: string }) {
+  return await new SignJWT(payload)
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime("7d")
+    .sign(getSecret())
 }
 
-export function verifyToken(token: string) {
+export async function verifyToken(token: string) {
   try {
-    return jwt.verify(token, JWT_SECRET) as { id: string; email: string; name: string }
+    const { payload } = await jwtVerify(token, getSecret())
+    return payload as { id: string; email: string; name: string }
   } catch {
     return null
   }

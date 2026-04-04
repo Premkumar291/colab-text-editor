@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
     const token = await getAuthToken()
     if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const decoded = verifyToken(token)
+    const decoded = await verifyToken(token)
     if (!decoded) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     await connectToDatabase()

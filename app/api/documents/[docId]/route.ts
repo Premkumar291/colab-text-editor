@@ -12,7 +12,7 @@ export async function GET(
     const token = await getAuthToken()
     if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const decoded = verifyToken(token)
+    const decoded = await verifyToken(token)
     if (!decoded) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     await connectToDatabase()
@@ -101,7 +101,7 @@ export async function PATCH(
     const token = await getAuthToken()
     if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const decoded = verifyToken(token)
+    const decoded = await verifyToken(token)
     if (!decoded) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     await connectToDatabase()
@@ -159,7 +159,7 @@ export async function DELETE(
     const token = await getAuthToken()
     if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const decoded = verifyToken(token)
+    const decoded = await verifyToken(token)
     if (!decoded) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     await connectToDatabase()

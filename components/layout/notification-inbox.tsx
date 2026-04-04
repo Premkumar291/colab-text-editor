@@ -57,6 +57,11 @@ export function NotificationInbox() {
       if (res.ok) {
         toast.success(data.message)
         setInvitations(prev => prev.filter(inv => inv._id !== id))
+        
+        // Notify other components (like the home page) to refresh their data
+        if (status === "accepted") {
+          window.dispatchEvent(new Event("refresh-documents"))
+        }
       } else {
         toast.error(data.error || "Action failed")
       }

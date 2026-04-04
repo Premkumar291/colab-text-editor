@@ -27,8 +27,7 @@ const UserSchema = new Schema<IUser>(
   { timestamps: true }
 )
 
-// Ensure uniqueness of the id field
-UserSchema.index({ id: 1 })
+// No explicit index needed for unique: true fields since Mongoose handles it automatically
 
 const UserModel = models.User || model<IUser>("User", UserSchema)
 

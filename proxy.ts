@@ -2,7 +2,6 @@ import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 import { jwtVerify } from "jose"
 
-const JWT_SECRET = process.env.JWT_SECRET || "default_fallback_secret_change_me"
 const COOKIE_NAME = "collab_auth_token"
 
 export async function proxy(request: NextRequest) {
@@ -19,32 +18,36 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url))
   }
 
-  // If token exists, verify it against the database for stateful session check
+  // If token exists, verify it
   if (token) {
     try {
-      // Note: We avoid heavy DB operations in proxy if possible, 
-      // but for "real-time product" security, we verify the token match.
-      const { jwtVerify } = await import("jose")
-      const secret = new TextEncoder().encode(JWT_SECRET)
+      // Use jose for consistency with auth-utils
+      const secret = new TextEncoder().encode(process.env.JWT_SECRET || "default_fallback_secret_change_me")
       const { payload } = await jwtVerify(token, secret)
       
-      // Verification against DB
-      const { default: connectToDatabase } = await import("@/lib/db")
-      const { default: UserModel } = await import("@/models/User")
-      
-      await connectToDatabase()
-      const user = await UserModel.findOne({ id: payload.id }).select("token").lean()
-      
-      if (!user || user.token !== token) {
-        // Token mismatch or user not found -> Session revoked
+      // For protected paths, we also verify against the database
+      if (isProtectedPath) {
+        const { default: connectToDatabase } = await import("@/lib/db")
+        const { default: UserModel } = await import("@/models/User")
+        
+        await connectToDatabase()
+        const user = await UserModel.findOne({ id: (payload as any).id }).select("token").lean()
+        
+        if (!user || (user as any).token !== token) {
+          throw new Error("Session revoked or user not found")
+        }
+      }
+    } catch (err) {
+      console.error("Proxy Auth Error:", err)
+      // If it's a protected path, we must redirect
+      if (isProtectedPath) {
         const response = NextResponse.redirect(new URL("/login", request.url))
         response.cookies.delete(COOKIE_NAME)
         return response
       }
-    } catch (err) {
-      console.error("Proxy Auth Error:", err)
-      if (isProtectedPath) {
-        const response = NextResponse.redirect(new URL("/login", request.url))
+      // For public paths, if the token is invalid, we just clear it
+      if (token) {
+        const response = NextResponse.next()
         response.cookies.delete(COOKIE_NAME)
         return response
       }
@@ -61,7 +64,7 @@ export async function proxy(request: NextRequest) {
   return NextResponse.next()
 }
 
-// See "Matching Paths" below to learn more
+// Next.js middleware configuration
 export const config = {
   matcher: [
     "/",

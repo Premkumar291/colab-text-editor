@@ -76,6 +76,8 @@ export function ShareModal({ docId, docName, trigger }: ShareModalProps) {
       const data = await res.json()
       if (res.ok) {
         toast.success(`Invitation sent to ${foundUser.name}!`)
+        // Notify other components (like the home page) to refresh their data
+        window.dispatchEvent(new Event("refresh-documents"))
         setIsOpen(false)
         resetForm()
       } else {

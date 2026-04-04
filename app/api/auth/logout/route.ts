@@ -7,7 +7,7 @@ export async function POST() {
   try {
     const token = await getAuthToken()
     if (token) {
-      const decoded = verifyToken(token)
+      const decoded = await verifyToken(token)
       if (decoded) {
         await connectToDatabase()
         await UserModel.findOneAndUpdate(

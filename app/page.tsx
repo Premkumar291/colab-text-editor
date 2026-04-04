@@ -61,7 +61,7 @@ export default function LandingPage() {
   const [isCollabOpen, setIsCollabOpen] = React.useState(false)
   const [isDeleting, setIsDeleting] = React.useState(false)
 
-  const fetchDocuments = async () => {
+  const fetchDocuments = React.useCallback(async () => {
     if (!user) return
     setIsLoading(true)
     try {
@@ -75,11 +75,15 @@ export default function LandingPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [user])
 
   React.useEffect(() => {
     if (user) fetchDocuments()
-  }, [user])
+
+    // Listen for global refresh events (from notification inbox)
+    window.addEventListener("refresh-documents", fetchDocuments)
+    return () => window.removeEventListener("refresh-documents", fetchDocuments)
+  }, [user, fetchDocuments])
 
   const handleCreateDoc = async () => {
     setIsCreating(true)
@@ -185,6 +189,10 @@ export default function LandingPage() {
 
       if (res.ok) {
         toast.success(inviteId ? "Invitation revoked" : "Collaborator removed")
+        
+        // Refresh the documents list to update counts
+        fetchDocuments()
+        
         setSelectedDoc((prev: any) => ({
           ...prev,
           collaborators: prev.collaborators.filter((c: any) => 
