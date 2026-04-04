@@ -20,44 +20,66 @@ A modern, professional-grade collaborative rich-text editor built with Next.js, 
 
 ## 🚀 Getting Started
 
-1.  **Clone the repository**:
-    ```bash
-    git clone <repository-url>
-    cd colab-text-editor
-    ```
+Follow these steps to set up the project locally.
 
-2.  **Install dependencies**:
-    ```bash
-    npm install
-    # Also install sync-service dependencies
-    cd colab-sync-service && npm install && cd ..
-    ```
+### 1. Clone the repository
+Get the code onto your machine:
+```bash
+git clone <repository-url>
+cd colab-text-editor
+```
 
-3.  **Set up environment variables**:
-    Create a `.env.local` file (root) and `.env` (colab-sync-service) with:
-    ```env
-    MONGODB_URI=your_mongodb_connection_string
-    JWT_SECRET=your_jwt_secret
-    # In production, use wss://your-sync-domain.com
-    NEXT_PUBLIC_COLAB_WS_URL=ws://localhost:1234
-    PORT=1234
-    ```
+### 2. Install Dependencies
+You need to install packages for both the frontend and the synchronization service.
 
-3.  **Run the application**:
-    ```bash
-    # Start the frontend
-    npm run dev
-    
-    # In a separate terminal, start the sync service
-    cd colab-sync-service && npm run dev
-    ```
+**Main App:**
+```bash
+npm install
+```
 
-4.  **Access the app**:
-    Navigate to [http://localhost:3000](http://localhost:3000).
+**Sync Service:**
+```bash
+cd colab-sync-service
+npm install
+cd ..
+```
+
+### 3. Setup Environment Variables
+Create the following files to store your credentials safely.
+
+**Frontend (`.env.local`):**
+```env
+MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+NEXT_PUBLIC_COLAB_WS_URL=ws://localhost:1234
+```
+
+**Sync Service (`colab-sync-service/.env`):**
+```env
+MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+PORT=1234
+```
+
+### 4. Launch the Application
+Start both services (requires two terminal windows).
+
+**Terminal 1 (Frontend):**
+```bash
+npm run dev
+```
+
+**Terminal 2 (Sync Service):**
+```bash
+cd colab-sync-service
+npm run dev
+```
+
+Once both are running, open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 📄 Documentation
 
-- **Architecture & Optimizations**: See [optimization.md](./optimization.md) for details on CRDT implementation and persistence.
+- **Project Structure**: See [files.md](./files.md) for a detailed description of every file and folder.
 - **API Reference**: Standard REST routes for document metadata and user management.
 
 ## 🏛️ Technical Implementation

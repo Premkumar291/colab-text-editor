@@ -204,6 +204,22 @@ const Editor = ({
 
   return (
     <div className="flex flex-col w-full h-full bg-background border-x border-b rounded-b-xl shadow-2xl overflow-hidden min-h-[700px] transition-all duration-300 relative">
+      {/* Notice Message for WebSocket Connection */}
+      {status !== "connected" && (
+        <div className="absolute inset-x-0 top-24 z-50 px-6 pointer-events-none animate-in slide-in-from-right-4 duration-1000">
+          <div className="bg-amber-50/90 backdrop-blur-sm border border-amber-200/50 rounded-2xl p-6 shadow-2xl flex items-center gap-5 max-w-lg mx-auto ring-8 ring-amber-50/30">
+            <div className="flex-shrink-0 h-12 w-12 flex items-center justify-center bg-amber-100 rounded-xl text-amber-600 shadow-inner">
+              <Loader2 className="h-7 w-7 animate-spin" />
+            </div>
+            <div className="space-y-1">
+              <h4 className="font-bold text-amber-900 text-sm tracking-tight uppercase">Initial Sync in Progress</h4>
+              <p className="text-amber-800/80 text-xs font-medium leading-relaxed">
+                Please wait <span className="font-bold text-amber-900">30sec to 60sec</span> for the websocket connection to stabilize.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Premium Header/Status Bar */}
       <div className="flex items-center justify-between border-b px-6 py-3 bg-muted/30 backdrop-blur-md">
         <div className="flex items-center gap-6">
