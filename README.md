@@ -95,3 +95,13 @@ Before pushing to a live environment, ensure:
 - **Port Security**: Ensure the synchronization service port (default `1234`) is open on your firewall but restricted to your application domain if possible.
 - **Process Management**: Use a process manager like **PM2** to keep the synchronization service running.
 - **Database Indexing**: Ensure `docId` and `userId` fields have indexes in MongoDB for optimal performance.
+- **SSL Termination**: Use a reverse proxy like **Nginx** or **Caddy** to handle SSL/TLS for your production deployment.
+
+## 🤖 AI Tools Used
+
+This project was developed with significant assistance from the following AI tools and technologies:
+
+- **Antigravity (Google DeepMind)**: Used as the primary AI coding assistant for architecting, implementing the entire synchronization engine, collaborative editor, and dashboard.
+- **Gemini (Google)**: Provided the underlying intelligence for complex problem-solving and real-time collaborative logic design.
+
+
